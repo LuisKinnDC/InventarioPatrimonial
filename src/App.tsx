@@ -27,6 +27,9 @@ const ReportesPage = lazy(() =>
 const FirmasPage = lazy(() =>
   import('@/pages/FirmasPage').then((m) => ({ default: m.FirmasPage })),
 )
+const PerfilPage = lazy(() =>
+  import('@/pages/PerfilPage').then((m) => ({ default: m.PerfilPage })),
+)
 
 export default function App() {
   const { session, cargando } = useAuth()
@@ -59,6 +62,7 @@ export default function App() {
           <Route path="importar" element={<ImportarPage />} />
           <Route path="reportes" element={<ReportesPage />} />
           <Route path="firmas" element={<FirmasPage />} />
+          <Route path="perfil" element={<PerfilPage />} />
         </Route>
         <Route path="/login" element={<Navigate to="/" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />

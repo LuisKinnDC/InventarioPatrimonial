@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '@/auth/AuthContext'
 import { Icon } from '@/components/Icon'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
@@ -112,17 +112,23 @@ export function Layout() {
           </div>
 
           <div className="flex shrink-0 items-center gap-space-sm sm:gap-space-md">
-            <div className="hidden text-right sm:block">
-              <div className="max-w-[180px] truncate font-label-md text-label-md font-semibold text-on-surface">
-                {perfil?.nombre ?? session?.user.email}
+            <Link
+              to="/perfil"
+              title="Ver mi perfil"
+              className="flex items-center gap-space-sm rounded-lg p-space-2xs hover:bg-surface-container-high"
+            >
+              <div className="hidden text-right sm:block">
+                <div className="max-w-[180px] truncate font-label-md text-label-md font-semibold text-on-surface">
+                  {perfil?.nombre ?? session?.user.email}
+                </div>
+                <div className="font-label-sm text-label-sm text-on-surface-variant">
+                  {perfil?.rol ?? 'LECTOR'}
+                </div>
               </div>
-              <div className="font-label-sm text-label-sm text-on-surface-variant">
-                {perfil?.rol ?? 'LECTOR'}
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-container font-label-md text-label-md font-bold text-on-primary">
+                {inicial}
               </div>
-            </div>
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-container font-label-md text-label-md font-bold text-on-primary">
-              {inicial}
-            </div>
+            </Link>
             <button
               onClick={() => setConfirmarSalir(true)}
               className="rounded-lg p-space-xs text-on-surface-variant hover:bg-surface-container-high"
