@@ -8,6 +8,7 @@ export function LoginPage() {
   const { signIn } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [verPassword, setVerPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [cargando, setCargando] = useState(false)
 
@@ -48,12 +49,24 @@ export function LoginPage() {
             <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />
           </Field>
           <Field label="Contraseña">
-            <Input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="relative">
+              <Input
+                type={verPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setVerPassword((v) => !v)}
+                title={verPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                aria-label={verPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                className="absolute right-1 top-1/2 -translate-y-1/2 rounded-md p-space-2xs text-on-surface-variant hover:bg-surface-container-high"
+              >
+                <Icon name={verPassword ? 'visibility_off' : 'visibility'} className="text-lg" />
+              </button>
+            </div>
           </Field>
 
           {error && (

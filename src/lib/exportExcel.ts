@@ -81,7 +81,7 @@ export async function exportarAnexo05Excel(
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: 'FF1E3A8A' },
+      fgColor: { argb: 'FF6D1F38' },
     }
     cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }
     cell.border = {

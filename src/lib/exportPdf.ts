@@ -56,7 +56,7 @@ export async function exportarAnexo05Pdf(
   autoTable(doc, {
     startY: 34,
     styles: { fontSize: 6.5, cellPadding: 1 },
-    headStyles: { fillColor: [30, 58, 138], textColor: 255, fontSize: 7 },
+    headStyles: { fillColor: [109, 31, 56], textColor: 255, fontSize: 7 },
     head: [
       [
         'Nº',

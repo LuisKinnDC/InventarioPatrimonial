@@ -4,6 +4,7 @@ import { Icon } from '@/components/Icon'
 import { Badge, Button, EmptyState, Modal, Select, Spinner } from '@/components/ui'
 import { BienForm, type ValoresBien } from '@/components/BienForm'
 import { ScannerCamara } from '@/components/ScannerCamara'
+import { ConfirmDialog } from '@/components/ConfirmDialog'
 import {
   useActualizarBien,
   useBienes,
@@ -40,6 +41,7 @@ export function BienesPage() {
     soloActivos: true,
   })
   const [editando, setEditando] = useState<BienConRelaciones | null>(null)
+  const [aEliminar, setAEliminar] = useState<BienConRelaciones | null>(null)
   const [scanMsg, setScanMsg] = useState<{ ok: boolean; texto: string } | null>(null)
   const [camaraAbierta, setCamaraAbierta] = useState(false)
 
@@ -90,9 +92,10 @@ export function BienesPage() {
     setEditando(null)
   }
 
-  const borrar = async (b: BienConRelaciones) => {
-    if (!confirm(`¿Eliminar definitivamente "${b.denominacion}"?`)) return
-    await eliminar.mutateAsync(b.id)
+  const confirmarBorrado = async () => {
+    if (!aEliminar) return
+    await eliminar.mutateAsync(aEliminar.id)
+    setAEliminar(null)
   }
 
   return (
@@ -281,7 +284,7 @@ export function BienesPage() {
                       <Button variant="ghost" onClick={() => setEditando(b)} className="px-space-xs py-space-2xs">
                         <Icon name="edit" className="text-base" />
                       </Button>
-                      <Button variant="ghost" onClick={() => borrar(b)} className="px-space-xs py-space-2xs">
+                      <Button variant="ghost" onClick={() => setAEliminar(b)} className="px-space-xs py-space-2xs">
                         <Icon name="delete" className="text-base text-error" />
                       </Button>
                     </td>
@@ -343,6 +346,18 @@ export function BienesPage() {
           onDetected={onCamaraDetecta}
         />
       )}
+
+      <ConfirmDialog
+        open={!!aEliminar}
+        title="Eliminar bien"
+        message={`¿Eliminar definitivamente "${aEliminar?.denominacion ?? ''}"? Esta acción no se puede deshacer.`}
+        confirmLabel="Eliminar"
+        danger
+        icon="delete"
+        loading={eliminar.isPending}
+        onConfirm={confirmarBorrado}
+        onCancel={() => setAEliminar(null)}
+      />
     </div>
   )
 }

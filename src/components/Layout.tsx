@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '@/auth/AuthContext'
 import { Icon } from '@/components/Icon'
+import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { useInstitucion } from '@/data/catalogos'
 
 const NAV = [
@@ -16,6 +18,7 @@ const NAV = [
 export function Layout() {
   const { session, perfil, signOut } = useAuth()
   const { data: institucion } = useInstitucion()
+  const [confirmarSalir, setConfirmarSalir] = useState(false)
   const inicial = (perfil?.nombre ?? session?.user.email ?? '?')
     .charAt(0)
     .toUpperCase()
@@ -86,7 +89,7 @@ export function Layout() {
               {inicial}
             </div>
             <button
-              onClick={() => void signOut()}
+              onClick={() => setConfirmarSalir(true)}
               className="rounded-lg p-space-xs text-on-surface-variant hover:bg-surface-container-high"
               title="Cerrar sesión"
             >
@@ -101,6 +104,19 @@ export function Layout() {
           </div>
         </main>
       </div>
+
+      <ConfirmDialog
+        open={confirmarSalir}
+        title="Cerrar sesión"
+        message="¿Seguro que deseas cerrar la sesión?"
+        confirmLabel="Cerrar sesión"
+        icon="logout"
+        onConfirm={() => {
+          setConfirmarSalir(false)
+          void signOut()
+        }}
+        onCancel={() => setConfirmarSalir(false)}
+      />
     </div>
   )
 }

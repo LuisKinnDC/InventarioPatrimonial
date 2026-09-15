@@ -32,7 +32,7 @@ interface FilaAgg {
   valor_total: number
 }
 
-const COLORS = ['#059669', '#d97706', '#e11d48', '#64748b', '#0051d5', '#00236f']
+const COLORS = ['#059669', '#d97706', '#e11d48', '#64748b', '#8a6a12', '#6d1f38']
 
 const soles = (n: number) =>
   new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(n ?? 0)
@@ -128,7 +128,7 @@ export function DashboardPage() {
                 <XAxis dataKey="nombre" fontSize={12} />
                 <YAxis fontSize={12} allowDecimals={false} />
                 <Tooltip />
-                <Bar dataKey="bienes" fill="#1e3a8a" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="bienes" fill="#6d1f38" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -143,7 +143,7 @@ export function DashboardPage() {
                 <XAxis type="number" fontSize={12} allowDecimals={false} />
                 <YAxis dataKey="nombre" type="category" fontSize={11} width={120} />
                 <Tooltip />
-                <Bar dataKey="bienes" fill="#0051d5" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="bienes" fill="#b8901f" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
