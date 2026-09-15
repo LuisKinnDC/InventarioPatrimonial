@@ -30,7 +30,7 @@ export function FirmasPage() {
           Conecta Supabase para configurar firmas e institución.
         </div>
       )}
-      <div className="grid grid-cols-1 gap-space-md lg:grid-cols-2">
+      <div className="grid grid-cols-1 items-start gap-space-md lg:grid-cols-2">
         <InstitucionCard />
         <FirmasCard />
       </div>
