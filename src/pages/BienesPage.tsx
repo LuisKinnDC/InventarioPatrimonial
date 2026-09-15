@@ -124,8 +124,8 @@ export function BienesPage() {
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-space-sm">
-            <div className="relative w-64">
+          <div className="flex w-full flex-wrap items-center gap-space-sm sm:w-auto">
+            <div className="relative w-full sm:w-64">
               <Icon
                 name="barcode_reader"
                 className="absolute left-2.5 top-2 text-base text-surface-container-high"

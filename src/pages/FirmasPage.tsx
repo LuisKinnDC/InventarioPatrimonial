@@ -1,9 +1,17 @@
 import { useState } from 'react'
 import { PageHeader } from '@/components/PageHeader'
 import { Icon } from '@/components/Icon'
+import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { Button, Field, Input, Spinner } from '@/components/ui'
-import { useFirmas, useGuardarFirma, useSubirImagenFirma } from '@/data/firmas'
+import {
+  useCrearFirma,
+  useEliminarFirma,
+  useFirmas,
+  useGuardarFirma,
+  useSubirImagenFirma,
+} from '@/data/firmas'
 import { useGuardarInstitucion, useInstitucion } from '@/data/catalogos'
+import { useAuth } from '@/auth/AuthContext'
 import { supabaseConfigurado } from '@/lib/supabase'
 import { mensajeError } from '@/lib/errores'
 import type { FirmaConfig, Institucion } from '@/types/database'
@@ -105,33 +113,96 @@ function InstitucionForm({ inicial }: { inicial: Partial<Institucion> }) {
 /* ------------------------------- Firmas -------------------------------- */
 function FirmasCard() {
   const { data: firmas = [], isLoading } = useFirmas()
+  const { perfil } = useAuth()
+  const esAdmin = perfil?.rol === 'ADMIN'
+  const crear = useCrearFirma()
+  const eliminar = useEliminarFirma()
+  const [aEliminar, setAEliminar] = useState<FirmaConfig | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const agregar = async () => {
+    setError(null)
+    try {
+      const orden = firmas.length
+        ? Math.max(...firmas.map((f) => f.orden)) + 1
+        : 1
+      await crear.mutateAsync(orden)
+    } catch (e) {
+      setError(mensajeError(e))
+    }
+  }
 
   return (
     <div className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
-      <div className="mb-space-md flex items-center gap-space-xs">
-        <Icon name="draw" className="text-primary text-lg" />
-        <h3 className="font-headline-sm text-headline-sm font-semibold text-primary">
-          Firmas y sellos (PNG transparente)
-        </h3>
+      <div className="mb-space-md flex flex-wrap items-center justify-between gap-space-sm">
+        <div className="flex items-center gap-space-xs">
+          <Icon name="draw" className="text-primary text-lg" />
+          <h3 className="font-headline-sm text-headline-sm font-semibold text-primary">
+            Firmas y sellos
+          </h3>
+        </div>
+        {esAdmin && (
+          <Button variant="secondary" icon="add" onClick={agregar} disabled={crear.isPending}>
+            {crear.isPending ? 'Agregando…' : 'Agregar cargo'}
+          </Button>
+        )}
       </div>
+
+      {error && (
+        <p className="mb-space-sm flex items-center gap-space-xs rounded-lg bg-rose-50 p-space-sm font-body-sm text-body-sm text-error">
+          <Icon name="error" className="text-base" />
+          {error}
+        </p>
+      )}
+
       {isLoading ? (
         <Spinner />
       ) : firmas.length === 0 ? (
         <p className="font-body-sm text-body-sm text-on-surface-variant">
-          No hay firmas configuradas. Se crean con el seed inicial.
+          No hay firmas configuradas.
+          {esAdmin ? ' Usa “Agregar cargo” para crear la primera.' : ''}
         </p>
       ) : (
         <div className="space-y-space-md">
           {firmas.map((f) => (
-            <FirmaItem key={f.id} firma={f} />
+            <FirmaItem
+              key={f.id}
+              firma={f}
+              esAdmin={esAdmin}
+              onEliminar={() => setAEliminar(f)}
+            />
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!aEliminar}
+        title="Eliminar firma"
+        message={`¿Eliminar el cargo “${aEliminar?.cargo ?? ''}” y su firma?`}
+        confirmLabel="Eliminar"
+        danger
+        icon="delete"
+        loading={eliminar.isPending}
+        onConfirm={async () => {
+          if (!aEliminar) return
+          await eliminar.mutateAsync(aEliminar.id)
+          setAEliminar(null)
+        }}
+        onCancel={() => setAEliminar(null)}
+      />
     </div>
   )
 }
 
-function FirmaItem({ firma }: { firma: FirmaConfig }) {
+function FirmaItem({
+  firma,
+  esAdmin,
+  onEliminar,
+}: {
+  firma: FirmaConfig
+  esAdmin: boolean
+  onEliminar: () => void
+}) {
   const guardar = useGuardarFirma()
   const subir = useSubirImagenFirma()
   const [cargo, setCargo] = useState(firma.cargo)
@@ -151,8 +222,8 @@ function FirmaItem({ firma }: { firma: FirmaConfig }) {
 
   return (
     <div className="rounded-lg border border-outline-variant/40 p-space-md">
-      <div className="flex items-start gap-space-md">
-        <div className="flex h-20 w-28 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-dashed border-outline-variant bg-surface-container-low">
+      <div className="flex flex-col gap-space-md sm:flex-row sm:items-start">
+        <div className="flex h-20 w-full shrink-0 items-center justify-center overflow-hidden rounded-lg border border-dashed border-outline-variant bg-surface-container-low sm:w-28">
           {firma.firma_url ? (
             <img src={firma.firma_url} alt={firma.cargo} className="max-h-full" />
           ) : (
@@ -172,7 +243,7 @@ function FirmaItem({ firma }: { firma: FirmaConfig }) {
               {error}
             </p>
           )}
-          <div className="flex items-center gap-space-sm">
+          <div className="flex flex-wrap items-center gap-space-sm">
             <Button
               variant="secondary"
               icon="save"
@@ -186,6 +257,11 @@ function FirmaItem({ firma }: { firma: FirmaConfig }) {
               {subir.isPending ? 'Subiendo…' : 'Subir PNG'}
               <input type="file" accept="image/png" hidden onChange={onArchivo} />
             </label>
+            {esAdmin && (
+              <Button variant="ghost" icon="delete" onClick={onEliminar} className="text-error">
+                Eliminar
+              </Button>
+            )}
           </div>
         </div>
       </div>

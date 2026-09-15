@@ -30,6 +30,30 @@ export function useGuardarFirma() {
   })
 }
 
+export function useCrearFirma() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (orden: number) => {
+      const { error } = await supabase
+        .from('firmas_config')
+        .insert({ cargo: 'NUEVO CARGO', nombre_responsable: '', orden })
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['firmas'] }),
+  })
+}
+
+export function useEliminarFirma() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('firmas_config').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['firmas'] }),
+  })
+}
+
 /** Sube un PNG al bucket `firmas` y devuelve la URL pública. */
 export function useSubirImagenFirma() {
   const qc = useQueryClient()
